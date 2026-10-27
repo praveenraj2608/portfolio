@@ -1,0 +1,113 @@
+---
+const path = Astro.url.pathname;
+const links = [
+  { href: '/#work', label: 'Work' },
+  { href: '/#about', label: 'About', hideSm: true },
+  { href: '/certifications', label: 'Certifications' },
+  { href: '/#contact', label: 'Contact' },
+];
+---
+
+<header class="header" data-header>
+  <div class="wrap bar">
+    <a href="/" class="mark" aria-label="Praveen Raj S, home">
+      <span class="dot" aria-hidden="true"></span>
+      <span>Praveen Raj<span class="muted">.S</span></span>
+    </a>
+    <nav aria-label="Primary">
+      <ul>
+        {
+          links.map((l) => (
+            <li class:list={{ 'hide-sm': l.hideSm }}>
+              <a href={l.href} aria-current={path.startsWith(l.href) && l.href !== '/' ? 'page' : undefined}>
+                {l.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<style>
+  .header {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    transition:
+      background-color 0.4s var(--ease),
+      border-color 0.4s var(--ease);
+    border-bottom: 1px solid transparent;
+  }
+
+  .header.is-scrolled {
+    background: color-mix(in srgb, var(--bg) 82%, transparent);
+    backdrop-filter: blur(14px);
+    border-bottom-color: var(--line);
+  }
+
+  .bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 72px;
+  }
+
+  .mark {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+  }
+
+  .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--accent);
+    animation: breathe 2.8s ease-in-out infinite;
+  }
+
+  @keyframes breathe {
+    50% {
+      opacity: 0.35;
+      transform: scale(0.8);
+    }
+  }
+
+  ul {
+    display: flex;
+    gap: clamp(14px, 3vw, 34px);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  nav a {
+    font-size: 0.92rem;
+    color: var(--muted);
+    transition: color 0.25s var(--ease);
+  }
+
+  nav a:hover,
+  nav a[aria-current='page'] {
+    color: var(--text);
+  }
+
+  @media (max-width: 640px) {
+    .hide-sm {
+      display: none;
+    }
+    nav a {
+      font-size: 0.85rem;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .dot {
+      animation: none;
+    }
+  }
+</style>

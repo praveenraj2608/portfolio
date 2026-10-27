@@ -1,0 +1,85 @@
+---
+import { getCollection } from 'astro:content';
+import Icon from './Icon.astro';
+
+const certs = await getCollection('certifications');
+---
+
+<section class="section" aria-labelledby="certs-title">
+  <div class="wrap">
+    <div class="head">
+      <div>
+        <p class="mono label" data-reveal><b>04</b> Certifications</p>
+        <h2 id="certs-title" class="section-title" data-reveal>Always learning. <em>Here's the paperwork.</em></h2>
+      </div>
+      <div data-reveal>
+        <a href="/certifications" class="btn" data-magnetic>
+          View all certificates <Icon name="arrow-right" />
+        </a>
+      </div>
+    </div>
+
+    <ul class="list">
+      {
+        certs.map((c, i) => (
+          <li class="row" data-reveal>
+            <span class="mono muted">{String(i + 1).padStart(2, '0')}</span>
+            <span class="name">{c.data.name}</span>
+            <span class="issuer muted">{c.data.issuer}</span>
+            <span class="mono muted date">{c.data.date ?? ''}</span>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>
+
+<style>
+  .head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: end;
+    justify-content: space-between;
+    gap: 28px;
+    margin-bottom: 56px;
+  }
+
+  .list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .row {
+    display: grid;
+    grid-template-columns: 60px 1.4fr 1fr 110px;
+    align-items: baseline;
+    gap: 20px;
+    padding-block: 24px;
+    border-top: 1px solid var(--line);
+    transition: padding 0.4s var(--ease);
+  }
+
+  .name {
+    font-size: clamp(1.15rem, 2.2vw, 1.7rem);
+    letter-spacing: -0.03em;
+    line-height: 1.2;
+  }
+
+  .date {
+    text-align: right;
+  }
+
+  @media (max-width: 760px) {
+    .row {
+      grid-template-columns: 40px 1fr;
+      row-gap: 4px;
+    }
+    .issuer,
+    .date {
+      grid-column: 2;
+      text-align: left;
+    }
+  }
+</style>

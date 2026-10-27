@@ -1,0 +1,23 @@
+[
+  {
+    "id": "aws-cloud-practitioner",
+    "name": "AWS Cloud Practitioner Essentials",
+    "issuer": "Amazon Web Services",
+    "date": "Sep 2026"
+  },
+  {
+    "id": "kaggle-ai-agents",
+    "name": "AI Agents Intensive Course with Google",
+    "issuer": "Kaggle x Google"
+  },
+  {
+    "id": "anthropic-claude-101",
+    "name": "Claude 101",
+    "issuer": "Anthropic"
+  },
+  {
+    "id": "meta-python",
+    "name": "Programming in Python",
+    "issuer": "Meta"
+  }
+]

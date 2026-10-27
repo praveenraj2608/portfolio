@@ -1,0 +1,105 @@
+---
+import { profile, skills } from '../data/profile';
+---
+
+<section id="about" class="section" aria-labelledby="about-title">
+  <div class="wrap grid">
+    <div class="intro">
+      <p class="mono label" data-reveal><b>01</b> About</p>
+      <h2 id="about-title" class="section-title" data-reveal>
+        I like turning models into things people <em>can actually use.</em>
+      </h2>
+    </div>
+
+    <div class="body">
+      <p class="lead" data-reveal>{profile.summary}</p>
+      <p class="muted" data-reveal>
+        I study {profile.education.degree} with a focus on {profile.education.focus} at {profile.education.school} ({profile.education.years}).
+        Outside class I ship client websites and build agent experiments, and I won the ZEN AI Hackathon in March 2026.
+      </p>
+
+      <dl class="skills">
+        {
+          skills.map((s) => (
+            <div class="row" data-reveal>
+              <dt class="mono muted">{s.group}</dt>
+              <dd>
+                {s.items.map((it) => (
+                  <span class="chip">{it}</span>
+                ))}
+              </dd>
+            </div>
+          ))
+        }
+      </dl>
+    </div>
+  </div>
+</section>
+
+<style>
+  .grid {
+    display: grid;
+    grid-template-columns: 5fr 7fr;
+    gap: clamp(40px, 7vw, 120px);
+  }
+
+  .intro {
+    position: sticky;
+    top: 120px;
+    align-self: start;
+  }
+
+  .body {
+    display: grid;
+    gap: 22px;
+    padding-top: 8px;
+  }
+
+  .lead {
+    font-size: clamp(1.15rem, 1.8vw, 1.45rem);
+    line-height: 1.5;
+  }
+
+  .body > p {
+    max-width: 62ch;
+  }
+
+  .skills {
+    margin: 24px 0 0;
+  }
+
+  .row {
+    display: grid;
+    grid-template-columns: 170px 1fr;
+    gap: 16px;
+    padding-block: 18px;
+    border-top: 1px solid var(--line);
+  }
+
+  .row dt {
+    padding-top: 6px;
+  }
+
+  .row dd {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 0;
+  }
+
+  @media (max-width: 900px) {
+    .grid {
+      grid-template-columns: 1fr;
+    }
+    .intro {
+      position: static;
+    }
+  }
+
+  @media (max-width: 560px) {
+    .row {
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+  }
+</style>

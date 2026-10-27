@@ -1,0 +1,217 @@
+---
+import { Picture } from 'astro:assets';
+import Icon from './Icon.astro';
+import { profile } from '../data/profile';
+import photo from '../assets/praveen.jpg';
+---
+
+<section class="hero" aria-labelledby="hero-title">
+  <div class="wrap grid">
+    <div class="copy">
+      <p class="mono kicker" data-hero-fade>
+        <span class="status" aria-hidden="true"></span>
+        {profile.seeking}
+      </p>
+
+      <h1 id="hero-title" class="name">
+        <span class="line"><span class="line-inner" data-hero-line>{profile.firstName}</span></span>
+        <span class="line"><span class="line-inner" data-hero-line>{profile.lastName}<span class="accent">.</span></span></span>
+      </h1>
+
+      <p class="role" data-hero-fade>
+        <span class="mono muted">AI/ML Engineer &middot; Generative AI &middot; AI Agents</span>
+      </p>
+      <p class="tagline" data-hero-fade>{profile.tagline}</p>
+
+      <div class="ctas" data-hero-fade>
+        <a href="#work" class="btn btn--solid" data-magnetic>
+          See my work <Icon name="arrow-right" />
+        </a>
+        <a href={profile.github} class="btn" target="_blank" rel="noopener" data-magnetic>
+          <Icon name="github" /> GitHub
+        </a>
+        <a href={profile.linkedin} class="btn" target="_blank" rel="noopener" data-magnetic>
+          <Icon name="linkedin" /> LinkedIn
+        </a>
+      </div>
+
+      <dl class="facts" data-hero-fade>
+        <div><dt class="mono muted">Hackathon</dt><dd>ZEN AI winner</dd></div>
+        <div><dt class="mono muted">Studying</dt><dd>B.E. CSE - AI &amp; ML</dd></div>
+        <div><dt class="mono muted">Based in</dt><dd>{profile.location}</dd></div>
+      </dl>
+    </div>
+
+    <figure class="portrait">
+      <div class="frame" data-hero-photo>
+        <Picture
+          src={photo}
+          formats={['avif', 'webp']}
+          widths={[480, 720, 960]}
+          sizes="(max-width: 768px) 92vw, 38vw"
+          alt="Praveen Raj S standing in front of a pine tree in the Nilgiris hills"
+          loading="eager"
+          fetchpriority="high"
+          data-hero-img
+        />
+      </div>
+      <figcaption class="mono caption">
+        <span data-scramble>{profile.location}</span>
+        <span class="muted" data-scramble>{profile.coords}</span>
+      </figcaption>
+    </figure>
+  </div>
+</section>
+
+<style>
+  .hero {
+    min-height: calc(100dvh - 72px);
+    display: flex;
+    align-items: center;
+    padding-block: 40px 72px;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: 7fr 5fr;
+    gap: clamp(32px, 6vw, 96px);
+    align-items: center;
+  }
+
+  .kicker {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--muted);
+    text-transform: none;
+  }
+
+  .status {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 18%, transparent);
+  }
+
+  .name {
+    margin-top: 28px;
+    font-size: clamp(3.4rem, 9.5vw, 8.6rem);
+    font-weight: 600;
+    letter-spacing: -0.055em;
+    line-height: 0.9;
+  }
+
+  .line {
+    display: block;
+    overflow: hidden;
+    padding-bottom: 0.06em;
+  }
+
+  .line-inner {
+    display: block;
+  }
+
+  .accent {
+    color: var(--accent);
+  }
+
+  .role {
+    margin-top: 28px;
+  }
+
+  .tagline {
+    margin-top: 12px;
+    max-width: 44ch;
+    font-size: clamp(1.05rem, 1.6vw, 1.3rem);
+    line-height: 1.5;
+  }
+
+  .ctas {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 36px;
+  }
+
+  .facts {
+    display: grid;
+    grid-template-columns: repeat(3, auto);
+    justify-content: start;
+    gap: 40px;
+    margin: 56px 0 0;
+    padding-top: 24px;
+    border-top: 1px solid var(--line);
+  }
+
+  .facts dd {
+    margin: 6px 0 0;
+    font-size: 0.98rem;
+  }
+
+  .portrait {
+    margin: 0;
+    position: relative;
+  }
+
+  /* Offset accent block behind the photo */
+  .portrait::before {
+    content: '';
+    position: absolute;
+    inset: 28px -18px -18px 28px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+  }
+
+  .frame {
+    position: relative;
+    aspect-ratio: 4 / 5;
+    border-radius: var(--radius);
+    overflow: hidden;
+    background: var(--surface);
+  }
+
+  .frame :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 55% 80%;
+  }
+
+  /* Gentle fade of the photo into the page */
+  .frame::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, color-mix(in srgb, var(--bg) 55%, transparent), transparent 40%);
+    pointer-events: none;
+  }
+
+  .caption {
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 34px;
+  }
+
+  @media (max-width: 900px) {
+    .grid {
+      grid-template-columns: 1fr;
+    }
+    .portrait {
+      max-width: 440px;
+      width: calc(100% - 18px);
+    }
+  }
+
+  @media (max-width: 560px) {
+    .facts {
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    .ctas .btn {
+      padding: 12px 18px;
+    }
+  }
+</style>

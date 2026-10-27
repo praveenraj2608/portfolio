@@ -1,0 +1,574 @@
+---
+import { getCollection, type CollectionEntry } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Icon from '../../components/Icon.astro';
+import ProjectArt from '../../components/ProjectArt.astro';
+
+export async function getStaticPaths() {
+  const projects = (await getCollection('projects')).sort((a, b) => a.data.order - b.data.order);
+  return projects.map((project, i) => ({
+    params: { slug: project.id },
+    props: { project, index: i, next: projects[(i + 1) % projects.length] },
+  }));
+}
+
+interface Props {
+  project: CollectionEntry<'projects'>;
+  index: number;
+  next: CollectionEntry<'projects'>;
+}
+
+const { project, index, next } = Astro.props;
+const d = project.data;
+const num = String(index + 1).padStart(2, '0');
+
+const toc = [
+  { id: 'what', label: 'What it does' },
+  { id: 'why', label: 'Why I built it' },
+  { id: 'stack', label: 'Tech stack' },
+  { id: 'problems', label: 'Problems I faced' },
+  ...(d.metrics ? [{ id: 'results', label: 'Results' }] : []),
+];
+---
+
+<BaseLayout title={`${d.title} - Praveen Raj S`} description={d.summary}>
+  <article class="case">
+    <header class="wrap intro">
+      <a href="/#work" class="back mono muted"><Icon name="arrow-left" /> All projects</a>
+      <p class="mono label" data-hero-fade><b>{num}</b> Case study &middot; {d.year}</p>
+      <h1 class="title">
+        <span class="line"><span class="line-inner" data-hero-line>{d.title}</span></span>
+      </h1>
+      <p class="summary" data-hero-fade>{d.summary}</p>
+
+      <div class="meta" data-hero-fade>
+        <dl>
+          <div><dt class="mono muted">Role</dt><dd>{d.role}</dd></div>
+          <div><dt class="mono muted">Status</dt><dd>{d.status === 'shipped' ? 'Shipped' : 'In progress'}</dd></div>
+        </dl>
+        <div class="ctas">
+          {
+            d.repo && (
+              <a href={d.repo} class="btn btn--solid" target="_blank" rel="noopener" data-magnetic>
+                <Icon name="github" /> View on GitHub
+              </a>
+            )
+          }
+          {
+            d.demo && (
+              <a href={d.demo} class="btn" target="_blank" rel="noopener" data-magnetic>
+                Live demo <Icon name="arrow-up-right" />
+              </a>
+            )
+          }
+          {!d.repo && <span class="mono muted soon">Repository coming soon</span>}
+        </div>
+      </div>
+    </header>
+
+    <div class="wrap">
+      <div class="cover" data-hero-photo>
+        <ProjectArt id={project.id} />
+      </div>
+    </div>
+
+    <div class="wrap body">
+      <nav class="toc" aria-label="On this page">
+        <ol>
+          {
+            toc.map((t, i) => (
+              <li>
+                <a href={`#${t.id}`} class="mono">
+                  <span class="muted">{String(i + 1).padStart(2, '0')}</span> {t.label}
+                </a>
+              </li>
+            ))
+          }
+        </ol>
+      </nav>
+
+      <div class="content">
+        <section id="what" class="block">
+          <h2 class="h" data-reveal>What it does</h2>
+          <ol class="what">
+            {
+              d.what.map((w, i) => (
+                <li data-reveal>
+                  <span class="mono n">{String(i + 1).padStart(2, '0')}</span>
+                  <p>{w}</p>
+                </li>
+              ))
+            }
+          </ol>
+        </section>
+
+        <section id="why" class="block">
+          <h2 class="h" data-reveal>Why I built it</h2>
+          <p class="why" data-reveal>{d.why}</p>
+        </section>
+
+        <section id="stack" class="block">
+          <h2 class="h" data-reveal>Tech stack</h2>
+          <dl class="stack">
+            {
+              Object.entries(d.stack).map(([group, items]) => (
+                <div class="stack-row" data-reveal>
+                  <dt class="mono muted">{group}</dt>
+                  <dd>
+                    {items.map((it) => (
+                      <span class="chip">{it}</span>
+                    ))}
+                  </dd>
+                </div>
+              ))
+            }
+          </dl>
+        </section>
+
+        <section id="problems" class="block">
+          <h2 class="h" data-reveal>Problems I faced and how I solved them</h2>
+          <ol class="problems">
+            {
+              d.problems.map((p, i) => (
+                <li class="pair" data-reveal>
+                  <div class="side">
+                    <span class="mono tag">Problem {String(i + 1).padStart(2, '0')}</span>
+                    <p>{p.problem}</p>
+                  </div>
+                  <span class="connector" data-connector aria-hidden="true" />
+                  <div class="side fix">
+                    <span class="mono tag">How I fixed it</span>
+                    <p>{p.fix}</p>
+                  </div>
+                </li>
+              ))
+            }
+          </ol>
+        </section>
+
+        {
+          d.metrics && (
+            <section id="results" class="block">
+              <h2 class="h" data-reveal>Results</h2>
+              <dl class="metrics">
+                {d.metrics.map((m) => (
+                  <div class="metric" data-reveal>
+                    <dt class="muted">{m.label}</dt>
+                    <dd class="value">
+                      <span data-count={m.value} data-decimals={m.decimals}>
+                        {m.value.toFixed(m.decimals)}
+                      </span>
+                      {m.suffix}
+                    </dd>
+                  </div>
+                ))}
+              </dl>
+              {d.limitations && (
+                <div class="limits" data-reveal>
+                  <p class="mono muted">Limitations</p>
+                  <ul>
+                    {d.limitations.map((l) => (
+                      <li class="muted">{l}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </section>
+          )
+        }
+      </div>
+    </div>
+
+    <a href={`/projects/${next.id}/`} class="next" data-reveal>
+      <div class="wrap next-inner">
+        <span class="mono muted">Next project</span>
+        <span class="next-title">{next.data.title} <Icon name="arrow-right" /></span>
+      </div>
+    </a>
+  </article>
+</BaseLayout>
+
+<style>
+  .intro {
+    padding-top: clamp(32px, 6vw, 72px);
+  }
+
+  .back {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: clamp(36px, 6vw, 72px);
+    text-transform: none;
+    transition: color 0.3s var(--ease);
+  }
+
+  .back:hover {
+    color: var(--text);
+  }
+
+  .back :global(svg) {
+    width: 16px;
+    height: 16px;
+  }
+
+  .title {
+    margin-top: 22px;
+    font-size: clamp(2.6rem, 7vw, 6.2rem);
+    font-weight: 600;
+    letter-spacing: -0.055em;
+    line-height: 0.95;
+    max-width: 16ch;
+  }
+
+  .line {
+    display: block;
+    overflow: hidden;
+    padding-bottom: 0.08em;
+  }
+
+  .line-inner {
+    display: block;
+  }
+
+  .summary {
+    margin-top: 26px;
+    max-width: 52ch;
+    font-size: clamp(1.1rem, 1.7vw, 1.35rem);
+    line-height: 1.5;
+  }
+
+  .meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: end;
+    justify-content: space-between;
+    gap: 28px;
+    margin-top: 44px;
+    padding-top: 24px;
+    border-top: 1px solid var(--line);
+  }
+
+  .meta dl {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 40px;
+    margin: 0;
+  }
+
+  .meta dd {
+    margin: 6px 0 0;
+  }
+
+  .ctas {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
+  }
+
+  .soon {
+    text-transform: none;
+  }
+
+  .cover {
+    position: relative;
+    margin-top: clamp(40px, 6vw, 72px);
+    aspect-ratio: 21 / 9;
+    overflow: hidden;
+    border-radius: calc(var(--radius) + 8px);
+    border: 1px solid var(--line);
+    background:
+      radial-gradient(90% 90% at 85% 0%, color-mix(in srgb, var(--accent) 12%, transparent), transparent 60%),
+      var(--surface);
+  }
+
+  .cover :global(.svg) {
+    width: min(560px, 80%);
+  }
+
+  .body {
+    display: grid;
+    grid-template-columns: 240px 1fr;
+    gap: clamp(32px, 6vw, 96px);
+    padding-block: clamp(64px, 9vw, 120px);
+  }
+
+  .toc {
+    position: sticky;
+    top: 110px;
+    align-self: start;
+  }
+
+  .toc ol {
+    display: grid;
+    gap: 14px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .toc a {
+    text-transform: none;
+    color: var(--muted);
+    transition: color 0.25s var(--ease);
+  }
+
+  .toc a:hover {
+    color: var(--text);
+  }
+
+  .content {
+    display: grid;
+    gap: clamp(64px, 9vw, 112px);
+    min-width: 0;
+  }
+
+  .block {
+    scroll-margin-top: 100px;
+  }
+
+  .h {
+    font-size: clamp(1.7rem, 3.4vw, 2.6rem);
+    letter-spacing: -0.04em;
+    line-height: 1.05;
+    margin-bottom: 32px;
+  }
+
+  .what {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .what li {
+    display: grid;
+    grid-template-columns: 48px 1fr;
+    gap: 12px;
+    padding-block: 18px;
+    border-top: 1px solid var(--line);
+  }
+
+  .what .n {
+    color: var(--accent);
+    padding-top: 4px;
+  }
+
+  .what p {
+    max-width: 62ch;
+  }
+
+  .why {
+    font-size: clamp(1.2rem, 2vw, 1.55rem);
+    line-height: 1.5;
+    max-width: 40ch;
+    padding-left: 24px;
+    border-left: 2px solid var(--accent);
+  }
+
+  .stack {
+    margin: 0;
+  }
+
+  .stack-row {
+    display: grid;
+    grid-template-columns: 180px 1fr;
+    gap: 16px;
+    padding-block: 18px;
+    border-top: 1px solid var(--line);
+  }
+
+  .stack-row dt {
+    padding-top: 6px;
+  }
+
+  .stack-row dd {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 0;
+  }
+
+  .draft {
+    margin: -16px 0 24px;
+    padding: 10px 14px;
+    border: 1px dashed var(--accent);
+    border-radius: 10px;
+    color: var(--accent);
+    text-transform: none;
+  }
+
+  .problems {
+    display: grid;
+    gap: 16px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .pair {
+    display: grid;
+    grid-template-columns: 1fr 40px 1fr;
+    align-items: stretch;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: var(--surface);
+    overflow: hidden;
+  }
+
+  .side {
+    display: grid;
+    align-content: start;
+    gap: 12px;
+    padding: 24px;
+  }
+
+  .side.fix {
+    background: color-mix(in srgb, var(--accent) 6%, var(--surface));
+  }
+
+  .tag {
+    color: var(--muted);
+  }
+
+  .fix .tag {
+    color: var(--accent);
+  }
+
+  .connector {
+    position: relative;
+    display: block;
+    align-self: center;
+    height: 1px;
+    background: var(--accent);
+    transform-origin: left;
+  }
+
+  .connector::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: -3px;
+    width: 7px;
+    height: 7px;
+    border-top: 1px solid var(--accent);
+    border-right: 1px solid var(--accent);
+    transform: rotate(45deg);
+  }
+
+  .metrics {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    margin: 0;
+    border-top: 1px solid var(--line);
+  }
+
+  .metric {
+    display: flex;
+    flex-direction: column-reverse;
+    justify-content: flex-end;
+    gap: 6px;
+    padding: 28px 24px 28px 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .metric:nth-child(odd) {
+    border-right: 1px solid var(--line);
+  }
+
+  .metric:nth-child(even) {
+    padding-left: 24px;
+  }
+
+  .value {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: clamp(2.2rem, 5vw, 3.6rem);
+    font-weight: 500;
+    letter-spacing: -0.04em;
+    line-height: 1;
+    color: var(--text);
+  }
+
+  .limits {
+    margin-top: 32px;
+  }
+
+  .limits ul {
+    margin: 12px 0 0;
+    padding-left: 18px;
+    display: grid;
+    gap: 6px;
+  }
+
+  .next {
+    display: block;
+    border-top: 1px solid var(--line);
+    padding-block: clamp(56px, 8vw, 104px);
+    transition: background-color 0.4s var(--ease);
+  }
+
+  .next:hover {
+    background: var(--surface);
+  }
+
+  .next-inner {
+    display: grid;
+    gap: 14px;
+  }
+
+  .next-title {
+    display: inline-flex;
+    align-items: center;
+    gap: 18px;
+    font-size: clamp(1.8rem, 5vw, 4rem);
+    font-weight: 500;
+    letter-spacing: -0.045em;
+    line-height: 1.05;
+  }
+
+  .next-title :global(svg) {
+    flex: none;
+    width: 0.8em;
+    height: 0.8em;
+    color: var(--accent);
+    transition: transform 0.4s var(--ease);
+  }
+
+  .next:hover .next-title :global(svg) {
+    transform: translateX(8px);
+  }
+
+  @media (max-width: 900px) {
+    .body {
+      grid-template-columns: 1fr;
+    }
+    .toc {
+      display: none;
+    }
+    .cover {
+      aspect-ratio: 4 / 3;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .pair {
+      grid-template-columns: 1fr;
+    }
+    .connector {
+      display: none;
+    }
+    .stack-row {
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+    .metrics {
+      grid-template-columns: 1fr;
+    }
+    .metric:nth-child(odd) {
+      border-right: 0;
+    }
+    .metric:nth-child(even) {
+      padding-left: 0;
+    }
+  }
+</style>

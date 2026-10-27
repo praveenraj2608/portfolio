@@ -1,0 +1,50 @@
+---
+import { marquee } from '../data/profile';
+// Two identical tracks so the loop can wrap seamlessly at -50%.
+const items = [...marquee, ...marquee];
+---
+
+<div class="marquee" aria-label="Tools I work with">
+  <div class="track" data-marquee>
+    {
+      items.map((item, i) => (
+        <span class="item" aria-hidden={i >= marquee.length ? 'true' : undefined}>
+          {item}
+          <span class="sep" aria-hidden="true" />
+        </span>
+      ))
+    }
+  </div>
+</div>
+
+<style>
+  .marquee {
+    border-block: 1px solid var(--line);
+    overflow: hidden;
+    padding-block: 22px;
+  }
+
+  .track {
+    display: flex;
+    width: max-content;
+  }
+
+  .item {
+    display: inline-flex;
+    align-items: center;
+    gap: 36px;
+    padding-right: 36px;
+    font-size: clamp(1.4rem, 3vw, 2.4rem);
+    font-weight: 500;
+    letter-spacing: -0.03em;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+
+  .sep {
+    width: 10px;
+    height: 10px;
+    border: 1px solid var(--accent);
+    transform: rotate(45deg);
+  }
+</style>

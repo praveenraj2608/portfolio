@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://praveenraj.pages.dev/sitemap-index.xml

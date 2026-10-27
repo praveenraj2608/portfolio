@@ -1,0 +1,178 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import Icon from './Icon.astro';
+import ProjectArt from './ProjectArt.astro';
+
+interface Props {
+  project: CollectionEntry<'projects'>;
+  index: number;
+  variant?: 'tall' | 'wide';
+}
+
+const { project, index, variant = 'tall' } = Astro.props;
+const { title, summary, year, stack, status } = project.data;
+const chips = Object.values(stack).flat().slice(0, 5);
+const num = String(index + 1).padStart(2, '0');
+---
+
+<a href={`/projects/${project.id}/`} class:list={['card', `card--${variant}`]} data-card data-reveal>
+  <div class="cover">
+    <ProjectArt id={project.id} />
+    <span class="num" aria-hidden="true">{num}</span>
+    {status === 'in-progress' && <span class="mono badge">Repo coming soon</span>}
+  </div>
+
+  <div class="meta">
+    <div class="top mono muted">
+      <span>{year}</span>
+      <span>{status === 'shipped' ? 'Shipped' : 'In progress'}</span>
+    </div>
+    <h3 class="title">{title}</h3>
+    <p class="summary muted">{summary}</p>
+    <ul class="chips" aria-label="Tech stack">
+      {
+        chips.map((c) => (
+          <li class="chip">{c}</li>
+        ))
+      }
+    </ul>
+    <span class="more">
+      Read the case study <Icon name="arrow-up-right" />
+    </span>
+  </div>
+</a>
+
+<style>
+  .card {
+    position: relative;
+    display: grid;
+    gap: 26px;
+    padding: 14px 14px 28px;
+    border: 1px solid var(--line);
+    border-radius: calc(var(--radius) + 8px);
+    background: var(--surface);
+    transform-style: preserve-3d;
+    will-change: transform;
+    isolation: isolate;
+  }
+
+  /* Spotlight border that follows the cursor (positions set from JS) */
+  .card::before {
+    content: '';
+    position: absolute;
+    inset: -1px;
+    border-radius: inherit;
+    padding: 1px;
+    background: radial-gradient(360px circle at var(--mx, 50%) var(--my, 0%), var(--accent), transparent 60%);
+    -webkit-mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    opacity: 0;
+    transition: opacity 0.4s var(--ease);
+    pointer-events: none;
+    z-index: -1;
+  }
+
+  .card:hover::before,
+  .card:focus-visible::before {
+    opacity: 1;
+  }
+
+  .cover {
+    position: relative;
+    aspect-ratio: 4 / 3;
+    overflow: hidden;
+    border-radius: var(--radius);
+    background:
+      radial-gradient(120% 80% at 80% 0%, color-mix(in srgb, var(--accent) 10%, transparent), transparent 60%),
+      var(--surface-2);
+  }
+
+  .num {
+    position: absolute;
+    left: 20px;
+    bottom: 10px;
+    font-size: clamp(3rem, 6vw, 5rem);
+    font-weight: 600;
+    letter-spacing: -0.06em;
+    line-height: 1;
+    color: transparent;
+    -webkit-text-stroke: 1px var(--line);
+  }
+
+  .badge {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    padding: 6px 12px;
+    border-radius: 999px;
+    background: var(--bg);
+    border: 1px solid var(--line);
+    color: var(--accent);
+    text-transform: none;
+  }
+
+  .meta {
+    display: grid;
+    gap: 14px;
+    padding-inline: 14px;
+  }
+
+  .top {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .title {
+    font-size: clamp(1.6rem, 2.6vw, 2.2rem);
+    letter-spacing: -0.035em;
+    line-height: 1.05;
+  }
+
+  .summary {
+    max-width: 52ch;
+  }
+
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 4px 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .more {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 8px;
+    color: var(--accent);
+    font-weight: 500;
+  }
+
+  .more :global(svg) {
+    width: 18px;
+    height: 18px;
+    transition: transform 0.35s var(--ease);
+  }
+
+  .card:hover .more :global(svg) {
+    transform: translate(3px, -3px);
+  }
+
+  /* Wide variant: cover and text side by side */
+  @media (min-width: 900px) {
+    .card--wide {
+      grid-template-columns: 5fr 7fr;
+      align-items: center;
+      gap: 40px;
+      padding: 14px 40px 14px 14px;
+    }
+    .card--wide .cover {
+      aspect-ratio: 16 / 10;
+    }
+  }
+</style>

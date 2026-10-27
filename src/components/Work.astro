@@ -1,0 +1,76 @@
+---
+import { getCollection } from 'astro:content';
+import ProjectCard from './ProjectCard.astro';
+
+const projects = (await getCollection('projects')).sort((a, b) => a.data.order - b.data.order);
+const [first, second, ...rest] = projects;
+---
+
+<section id="work" class="section" aria-labelledby="work-title">
+  <div class="wrap">
+    <div class="head">
+      <div>
+        <p class="mono label" data-reveal><b>02</b> Selected work</p>
+        <h2 id="work-title" class="section-title" data-reveal>
+          Projects, with the <em>messy parts included.</em>
+        </h2>
+      </div>
+      <p class="muted note" data-reveal>
+        Each case study covers what I built, why I built it, the stack, and the problems I had to solve along the way.
+      </p>
+    </div>
+
+    <div class="zigzag">
+      {first && <div class="a"><ProjectCard project={first} index={0} /></div>}
+      {second && <div class="b"><ProjectCard project={second} index={1} /></div>}
+    </div>
+
+    {
+      rest.map((p, i) => (
+        <div class="wide">
+          <ProjectCard project={p} index={i + 2} variant="wide" />
+        </div>
+      ))
+    }
+  </div>
+</section>
+
+<style>
+  .head {
+    display: grid;
+    grid-template-columns: 1fr minmax(0, 340px);
+    align-items: end;
+    gap: 32px;
+    margin-bottom: clamp(48px, 7vw, 96px);
+  }
+
+  .note {
+    max-width: 38ch;
+  }
+
+  .zigzag {
+    display: grid;
+    grid-template-columns: 7fr 5fr;
+    gap: clamp(24px, 4vw, 56px);
+    align-items: start;
+  }
+
+  /* Offset the second card down to break the grid */
+  .b {
+    margin-top: clamp(80px, 14vw, 220px);
+  }
+
+  .wide {
+    margin-top: clamp(24px, 4vw, 56px);
+  }
+
+  @media (max-width: 900px) {
+    .head,
+    .zigzag {
+      grid-template-columns: 1fr;
+    }
+    .b {
+      margin-top: 0;
+    }
+  }
+</style>
